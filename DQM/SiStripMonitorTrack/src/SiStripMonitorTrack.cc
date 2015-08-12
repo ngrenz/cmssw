@@ -123,7 +123,7 @@ void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es
   if (Trend_On_) {
  // for (std::map<std::string, SubDetMEs>::iterator iSubDet = SubDetMEsMap.begin(), iterEnd=SubDetMEsMaps.end();
  //      iSubDet != iterEnd; ++iSubDet) {
-    for (auto iSubDet : SubDetMEsMap) {
+    for (auto const &iSubDet : SubDetMEsMap) {
       SubDetMEs subdet_mes = iSubDet.second;
       if (subdet_mes.totNClustersOnTrack > 0) {
         fillME(subdet_mes.nClustersOnTrack, subdet_mes.totNClustersOnTrack);
@@ -133,7 +133,7 @@ void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es
       fillME(subdet_mes.nClustersTrendOffTrack,iLumisection,subdet_mes.totNClustersOffTrack);
     }
   } else {
-    for (auto iSubDet : SubDetMEsMap) {
+    for (auto const &iSubDet : SubDetMEsMap) {
       SubDetMEs subdet_mes = iSubDet.second;
       if (subdet_mes.totNClustersOnTrack > 0) {
         fillME(subdet_mes.nClustersOnTrack, subdet_mes.totNClustersOnTrack);

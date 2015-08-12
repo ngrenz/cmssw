@@ -424,12 +424,6 @@ SiStripTrackingRecHitsValid::SiStripTrackingRecHitsValid(const edm::ParameterSet
   edm::ParameterSet ParametersPullyMatched =  conf_.getParameter<edm::ParameterSet>("TH1PullyMatched");
   layerswitchPullyMatched = ParametersPullyMatched.getParameter<bool>("layerswitchon");
 
-  rechitpro.x = -999999.; rechitpro.y = -999999.; rechitpro.z = -999999.; rechitpro.resolxx = -999999.; rechitpro.resolxy = -999999.;   rechitpro.resolyy = -999999.; 
-  rechitpro.resolxxMF = -999999.; rechitpro.resx = -999999.; rechitpro.resy = -999999.; rechitpro.resxMF = -999999.; 
-  rechitpro.pullx = -999999.; rechitpro.pully = -999999.; rechitpro.pullxMF = -999999.; rechitpro.trackangle = -999999.; rechitpro.trackanglebeta = -999999.; 
-  rechitpro.trackwidth = -999999.; rechitpro.expectedwidth = -999999.; rechitpro.category = -999999.; rechitpro.thickness = -999999.; 
-  rechitpro.clusiz = -999999.; rechitpro.cluchg = -999999.; 
- // rechitpro.trackangle2 = -999999.; rechitpro.phi = -999999.;
 }
 
 //Destructor
@@ -513,7 +507,7 @@ void SiStripTrackingRecHitsValid::analyze(const edm::Event & e, const edm::Event
 
     vector < TrajectoryMeasurement > tmColl = it->measurements();
  
-    for (auto itTraj : tmColl ) {
+    for (auto const &itTraj : tmColl ) {
       if (itTraj.updatedState().isValid()) {
         //edm::LogVerbatim("TrajectoryAnalyzer") << "tm number: " <<
         //   (itTraj - tmColl.begin()) + 1<< " , " << "tm.backwardState.pt: " <<
@@ -1050,7 +1044,7 @@ void SiStripTrackingRecHitsValid::rechitanalysis_matched(TrajectoryStateOnSurfac
     std::pair<LocalPoint,LocalVector> hitPair;
    
     if (matchedmonorstereo =="matched") {
-      for(auto m : matched){
+      for(auto const &m : matched){
         //project simhit;
  	hitPair= projectHit(m,partnerstripdet,gluedDet->surface());
 	distx = fabs(rechitpro.x - hitPair.first.x());
@@ -1067,7 +1061,7 @@ void SiStripTrackingRecHitsValid::rechitanalysis_matched(TrajectoryStateOnSurfac
       rechitpro.pullx = ((rechit)->localPosition().x() - (closestPair.first.x())) / sqrt(error.xx());
       rechitpro.pully = ((rechit)->localPosition().y() - (closestPair.first.y())) / sqrt(error.yy());
     } else if(matchedmonorstereo == "monoHit"){
-      for(auto m : matched ){
+      for(auto const &m : matched ){
         //project simhit;
         dist = abs((monohit)->localPosition().x() - m.localPosition().x());
         if(dist<mindist){
@@ -1081,7 +1075,7 @@ void SiStripTrackingRecHitsValid::rechitanalysis_matched(TrajectoryStateOnSurfac
       rechitpro.pullx = (rechit->localPosition().x() - (closest).localPosition().x()) / sqrt(error.xx());
       rechitpro.pullxMF = (rechitpro.resxMF)/sqrt(Merror.uu());
      } else if(matchedmonorstereo == "stereoHit"){
-      for(auto m : matched){
+      for(auto const &m : matched){
         //project simhit;
         dist = abs((stereohit)->localPosition().x() - m.localPosition().x());
         if(dist<mindist){
@@ -1176,7 +1170,7 @@ void SiStripTrackingRecHitsValid::rechitanalysis(TrajectoryStateOnSurface tsos, 
   if(simplehit1or2D){
     matched = associate.associateHit(*hit1d);
     if(!matched.empty()){
-      for(auto m : matched ){
+      for(auto const &m : matched ){
         dist = abs((hit1d)->localPosition().x() - m.localPosition().x());
         if(dist<mindist){
 	  mindist = dist;
@@ -1191,7 +1185,7 @@ void SiStripTrackingRecHitsValid::rechitanalysis(TrajectoryStateOnSurface tsos, 
   } else {
     matched = associate.associateHit(*hit2d);
     if(!matched.empty()){
-      for(auto m : matched ){
+      for(auto const &m : matched ){
         dist = abs((hit2d)->localPosition().x() - m.localPosition().x());
         if(dist<mindist){
 	  mindist = dist;
