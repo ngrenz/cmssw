@@ -47697,7 +47697,7 @@ Tracker Pixels {
 <Cone name="Ring13Layer1Plus" rMax1="357.169*mm" rMax2="226.527*mm" rMin1="279.565*mm" rMin2="148.922*mm" dz="18.7305*mm" startPhi="0*deg" deltaPhi="360*deg"/>
 <Cone name="Ring14Layer1Plus" rMax1="357.169*mm" rMax2="226.527*mm" rMin1="279.565*mm" rMin2="148.922*mm" dz="18.7305*mm" startPhi="0*deg" deltaPhi="360*deg"/>
 <Cone name="Ring15Layer1Plus" rMax1="357.169*mm" rMax2="226.527*mm" rMin1="279.565*mm" rMin2="148.922*mm" dz="18.7305*mm" startPhi="0*deg" deltaPhi="360*deg"/>
-<Tubs name="Layer1" rMin="148.912*mm" rMax="357.179*mm" dz="1175.95*mm" startPhi="0*deg" deltaPhi="360*deg"/>
+<Tubs name="Layer1" rMin="148.912*mm" rMax="307.55*mm" dz="1175.95*mm" startPhi="0*deg" deltaPhi="360*deg"/>
 <Box name="BModule1Layer2" dx="60*mm" dy="34.63*mm" dz="2*mm"/>
 <Box name="BModule1Layer2Lowerwafer" dx="48*mm" dy="23.13*mm" dz="0.1*mm"/>
 <Box name="BModule1Layer2Upperwafer" dx="48*mm" dy="23.13*mm" dz="0.1*mm"/>
