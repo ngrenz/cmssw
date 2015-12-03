@@ -1,8 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1
+
+from SLHCUpgradeSimulations.Configuration.phase2TkCustomsBE5DPixel10D import customise as customiseBE5DPixel10D #ngrenz
+from SLHCUpgradeSimulations.Configuration.phase2TkCustomsBE5DPixel10D import l1EventContent as customise_ev_BE5DPixel10D #ngrenz
+
 from SLHCUpgradeSimulations.Configuration.customise_mixing import customise_NoCrossing
 from SLHCUpgradeSimulations.Configuration.phase1TkCustoms import customise as customisePhase1Tk
-from SLHCUpgradeSimulations.Configuration.HCalCustoms import customise_HcalPhase1, customise_HcalPhase0
+from SLHCUpgradeSimulations.Configuration.HCalCustoms import customise_HcalPhase1, customise_HcalPhase0, customise_HcalPhase2 # ngrenz added 2
 
 from SLHCUpgradeSimulations.Configuration.gemCustoms import customise2019 as customise_gem2019
 from SLHCUpgradeSimulations.Configuration.gemCustoms import customise2023 as customise_gem2023
@@ -11,6 +15,15 @@ from SLHCUpgradeSimulations.Configuration.rpcCustoms import customise as customi
 from SLHCUpgradeSimulations.Configuration.fixMissingUpgradeGTPayloads import fixRPCConditions
 
 import SLHCUpgradeSimulations.Configuration.aging as aging
+
+# ngrenz:
+def cust_phase2_BE5DPixel10D(process):
+    process=customisePostLS1(process)
+    process=customiseBE5DPixel10D(process)
+    process=customise_HcalPhase2(process)
+    process=customise_ev_BE5DPixel10D(process)
+    process=jetCustoms.customise_jets(process)
+    return process
 
 def cust_2017(process):
     process=customisePostLS1(process)

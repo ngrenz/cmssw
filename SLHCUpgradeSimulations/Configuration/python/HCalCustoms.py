@@ -71,6 +71,37 @@ def customise_HcalPhase1(process):
     process=customise_condOverRides(process)
     return process
 
+def customise_HcalPhase2(process):
+    process = customise_HcalPhase1(process)
+    if hasattr(process,'digitisation_step') and hasattr(process, 'mix'):
+
+        # these are the new sampling factors,  they reuse the old ones for
+        # ieta < 21.  For ieta greater than 21 it is using the function
+        # samplingFraction = 188.441 + 0.834*eta
+        # eta is the highest eta broundary of the ieta.  This is currently
+        # taken for HE from ieta 16 to 33 inclusive.  Which would extend to
+        # an eta of 3.0.  For the option going to 4.0 it is unclear how many
+        # ieta's there will be from 3 to 4, but this vector would need to be
+        # extended.
+        newFactors = cms.vdouble(
+            210.55, 197.93, 186.12, 189.64, 189.63,
+            189.96, 190.03, 190.11, 190.18, 190.25,
+            190.32, 190.40, 190.47, 190.54, 190.61,
+            190.69, 190.83, 190.94, 190.94, 190.94,
+            190.94, 190.94, 190.94, 190.94, 190.94,
+            190.94, 190.94, 190.94, 190.94, 190.94,
+            190.94, 190.94, 190.94, 190.94, 190.94,
+            190.94, 190.94, 190.94, 190.94, 190.94)
+        process.mix.digitizers.hcal.he.samplingFactors = newFactors
+        process.mix.digitizers.hcal.he.photoelectronsToAnalog = cms.vdouble([10.]*len(newFactors))
+
+    if hasattr(process,'reconstruction_step'):
+        process.towerMaker.HcalPhase = cms.int32(2)
+        process.towerMakerPF.HcalPhase = cms.int32(2)
+        process.towerMakerWithHO.HcalPhase = cms.int32(2)
+        process.CaloTowerConstituentsMapBuilder.MapFile = cms.untracked.string("")
+
+    return process
 
 def customise_Sim(process):
     process.g4SimHits.HCalSD.TestNumberingScheme = True
