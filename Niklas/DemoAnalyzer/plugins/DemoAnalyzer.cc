@@ -23,6 +23,7 @@
 
 // user include files
 
+
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "Alignment/CommonAlignmentMonitor/interface/AlignmentMonitorBase.h"
@@ -50,7 +51,11 @@
 #include "DataFormats/DetId/interface/DetId.h"
 
 //DQM services
-//#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/ServiceRegistry/interface/Server.h"
+#include <SimTracker/SiPixelDigitizer/interface/RemapDetIdService.h>
+#include "DQMServices/Core/interface/DQMStore.h"
+#include "DQMServices/Core/interface/MonitorElement.h"
+
 // tracker info
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
@@ -65,12 +70,11 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include "CommonTools/Utils/interface/TFileDirectory.h"
+//#include "CommonTools/Utils/interface/TFileDirectory.h"
 #include "TString.h"
-#include "TH1F.h"
-#include "TProfile.h"
-#include "TTree.h"
-#include "FWCore/Utilities/interface/typelookup.h"
+//#include "TH1F"
+//#include "TProfile.h"
+//#include "TTree.h"
 
 #include "FWCore/Framework/interface/EventSetupRecordImplementation.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -89,11 +93,11 @@ class DemoAnalyzer : public edm::EDAnalyzer {
     bool printModules;
 
   protected:
-    TH1F *book1D(std::string dir, std::string name, std::string title, int nchX, double lowX, double highX);
+ //   MonitorElement *book1D(std::string dir, std::string name, std::string title, int nchX, double lowX, double highX);
 
   private:
-    TFileDirectory *directory(std::string dir);
-    TH1F *book1Demo(std::string name, std::string title, int nchX, double lowX, double highX);
+//    TFileDirectory *directory(std::string dir);
+//    MonitorElement *book1Demo(std::string name, std::string title, int nchX, double lowX, double highX);
     virtual void beginJob() override;
     virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
     virtual void endJob() override;
@@ -109,13 +113,13 @@ class DemoAnalyzer : public edm::EDAnalyzer {
   // TrackerInfo
   // Pixel info
     int nPxlHits;
-    TH1 *meTrackerPx[2];
-    TH1F *meTrackerPxPhi;
-    TH1F *meTrackerPxEta;
-    TH1F *meTrackerPxBToF;
-    TH1F *meTrackerPxBR;
-    TH1F *meTrackerPxFToF;
-    TH1F *meTrackerPxFZ;
+    MonitorElement *meTrackerPx[2];
+    MonitorElement *meTrackerPxPhi;
+    MonitorElement *meTrackerPxEta;
+    MonitorElement *meTrackerPxBToF;
+    MonitorElement *meTrackerPxBR;
+    MonitorElement *meTrackerPxFToF;
+    MonitorElement *meTrackerPxFZ;
     edm::InputTag PxlBrlLowSrc_;
     edm::InputTag PxlBrlHighSrc_;
     edm::InputTag PxlFwdLowSrc_;
@@ -123,13 +127,13 @@ class DemoAnalyzer : public edm::EDAnalyzer {
 
     // Strip info
     int nSiHits;
-    TH1F *meTrackerSi[2];
-    TH1F *meTrackerSiPhi;
-    TH1F *meTrackerSiEta;
-    TH1F *meTrackerSiBToF;
-    TH1F *meTrackerSiBR;
-    TH1F *meTrackerSiFToF;
-    TH1F *meTrackerSiFZ;
+    MonitorElement *meTrackerSi[2];
+    MonitorElement *meTrackerSiPhi;
+    MonitorElement *meTrackerSiEta;
+    MonitorElement *meTrackerSiBToF;
+    MonitorElement *meTrackerSiBR;
+    MonitorElement *meTrackerSiFToF;
+    MonitorElement *meTrackerSiFZ;
     edm::InputTag SiTIBLowSrc_;
     edm::InputTag SiTIBHighSrc_;
     edm::InputTag SiTOBLowSrc_;
@@ -198,113 +202,112 @@ DemoAnalyzer::DemoAnalyzer(const edm::ParameterSet& iConfig)
   //get dqm info and create histograms
   Char_t hname[200];
   Char_t htitle[200];
-//  dbe = 0;
-//  dbe = edm::Service<DQMStore>().operator->();
-//  if (dbe) {
-//    dbe->setVerbose(1);
-//    dbe->showDirStructure();
+  dbe = 0;
+  dbe = edm::Service<DQMStore>().operator->();
+  if (dbe) {
+    dbe->setVerbose(1);
+    dbe->showDirStructure();
  
     // Pixels
-//    dbe->setCurrentFolder("GlobalHitsV/SiPixels");
+    dbe->setCurrentFolder("GlobalHitsV/SiPixels");
     sprintf(hname,"hTrackerPx1");
     sprintf(htitle,"Pixel hits");
-//    meTrackerPx[0] = dbe->book1Demo(hname,htitle,100,0.,10000.);
+    meTrackerPx[0] = dbe->book1D(hname,htitle,100,0.,10000.);
     sprintf(hname,"hTrackerPx2");
-    meTrackerPx[1] = book1Demo(hname,htitle,100,-0.5,99.5);
+    meTrackerPx[1] = dbe->book1D(hname,htitle,100,-0.5,99.5);
     for (Int_t i = 0; i < 2; ++i) {
- //      meTrackerPx[i]->setAxisTitle("Number of Pixel Hits",1);
-  //     meTrackerPx[i]->setAxisTitle("Count",2);
+      meTrackerPx[i]->setAxisTitle("Number of Pixel Hits",1);
+      meTrackerPx[i]->setAxisTitle("Count",2);
     }
 
     sprintf(hname,"hTrackerPxPhi");
     sprintf(htitle,"Pixel hits phi/rad");
-    meTrackerPxPhi = book1Demo(hname,htitle,100,-3.2,3.2);
-  //   meTrackerPxPhi->setAxisTitle("Phi of Hits (rad)",1);
- //    meTrackerPxPhi->setAxisTitle("Count",2);
+    meTrackerPxPhi = dbe->book1D(hname,htitle,100,-3.2,3.2);
+    meTrackerPxPhi->setAxisTitle("Phi of Hits (rad)",1);
+    meTrackerPxPhi->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerPxEta");
     sprintf(htitle,"Pixel hits eta");
-    meTrackerPxEta = book1Demo(hname,htitle,100,-3.5,3.5);
- //    meTrackerPxEta->setAxisTitle("Eta of Hits",1);
- //    meTrackerPxEta->setAxisTitle("Count",2);
+    meTrackerPxEta = dbe->book1D(hname,htitle,100,-3.5,3.5);
+    meTrackerPxEta->setAxisTitle("Eta of Hits",1);
+    meTrackerPxEta->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerPxBToF");
     sprintf(htitle,"Pixel barrel hits, ToF/ns");
-    meTrackerPxBToF = book1Demo(hname,htitle,100,0.,40.);
- //    meTrackerPxBToF->setAxisTitle("Time of Flight of Hits (ns)",1);
- //    meTrackerPxBToF->setAxisTitle("Count",2);
+    meTrackerPxBToF = dbe->book1D(hname,htitle,100,0.,40.);
+    meTrackerPxBToF->setAxisTitle("Time of Flight of Hits (ns)",1);
+    meTrackerPxBToF->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerPxBR");
     sprintf(htitle,"Pixel barrel hits, R/cm");
-    meTrackerPxBR = book1Demo(hname,htitle,100,0.,50.);
- //    meTrackerPxBR->setAxisTitle("R of Hits (cm)",1);
- //    meTrackerPxBR->setAxisTitle("Count",2);
+    meTrackerPxBR = dbe->book1D(hname,htitle,100,0.,50.);
+    meTrackerPxBR->setAxisTitle("R of Hits (cm)",1);
+    meTrackerPxBR->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerPxFToF");
     sprintf(htitle,"Pixel forward hits, ToF/ns");
-    meTrackerPxFToF = book1Demo(hname,htitle,100,0.,50.);
- //    meTrackerPxFToF->setAxisTitle("Time of Flight of Hits (ns)",1);
- //    meTrackerPxFToF->setAxisTitle("Count",2);
+    meTrackerPxFToF = dbe->book1D(hname,htitle,100,0.,50.);
+    meTrackerPxFToF->setAxisTitle("Time of Flight of Hits (ns)",1);
+    meTrackerPxFToF->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerPxFZ");
     sprintf(htitle,"Pixel forward hits, Z/cm");
-    meTrackerPxFZ = book1Demo(hname,htitle,200,-100.,100.);
- //    meTrackerPxFZ->setAxisTitle("Z of Hits (cm)",1);
- //    meTrackerPxFZ->setAxisTitle("Count",2);
-    meTrackerPxFZ->GetXaxis()->SetTitle("Z of Hits (cm)");
-    meTrackerPxFZ->GetYaxis()->SetTitle("Count");
-
+    meTrackerPxFZ = 
+      dbe->book1D(hname,htitle,200,-100.,100.);
+    meTrackerPxFZ->setAxisTitle("Z of Hits (cm)",1);
+    meTrackerPxFZ->setAxisTitle("Count",2);
 
     // Strips
-   // dbe->setCurrentFolder("GlobalHitsV/SiStrips");
+    dbe->setCurrentFolder("GlobalHitsV/SiStrips");
     sprintf(hname,"hTrackerSi1");
     sprintf(htitle,"Silicon hits");
-    meTrackerSi[0] = book1Demo(hname,htitle,100,0.,10000.);
+    meTrackerSi[0] = dbe->book1D(hname,htitle,100,0.,10000.);
     sprintf(hname,"hTrackerSi2");
-    meTrackerSi[1] = book1Demo(hname,htitle,100,-0.5,99.5);
+    meTrackerSi[1] = dbe->book1D(hname,htitle,100,-0.5,99.5);
     for (Int_t i = 0; i < 2; ++i) { 
- //      meTrackerSi[i]->setAxisTitle("Number of Silicon Hits",1);
- //      meTrackerSi[i]->setAxisTitle("Count",2);
+      meTrackerSi[i]->setAxisTitle("Number of Silicon Hits",1);
+      meTrackerSi[i]->setAxisTitle("Count",2);
     }
 
     sprintf(hname,"hTrackerSiPhi");
     sprintf(htitle,"Silicon hits phi/rad");
-    meTrackerSiPhi = book1Demo(hname,htitle,100,-3.2,3.2);
- //    meTrackerSiPhi->setAxisTitle("Phi of Hits (rad)",1);
- //    meTrackerSiPhi->setAxisTitle("Count",2);
+    meTrackerSiPhi = dbe->book1D(hname,htitle,100,-3.2,3.2);
+    meTrackerSiPhi->setAxisTitle("Phi of Hits (rad)",1);
+    meTrackerSiPhi->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerSiEta");
     sprintf(htitle,"Silicon hits eta");
-    meTrackerSiEta = book1Demo(hname,htitle,100,-3.5,3.5);
- //    meTrackerSiEta->setAxisTitle("Eta of Hits",1);
- //    meTrackerSiEta->setAxisTitle("Count",2);
+    meTrackerSiEta = dbe->book1D(hname,htitle,100,-3.5,3.5);
+    meTrackerSiEta->setAxisTitle("Eta of Hits",1);
+    meTrackerSiEta->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerSiBToF");
     sprintf(htitle,"Silicon barrel hits, ToF/ns");
-    meTrackerSiBToF = book1Demo(hname,htitle,100,0.,50.);
- //    meTrackerSiBToF->setAxisTitle("Time of Flight of Hits (ns)",1);
- //    meTrackerSiBToF->setAxisTitle("Count",2);
+    meTrackerSiBToF = dbe->book1D(hname,htitle,100,0.,50.);
+    meTrackerSiBToF->setAxisTitle("Time of Flight of Hits (ns)",1);
+    meTrackerSiBToF->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerSiBR");
     sprintf(htitle,"Silicon barrel hits, R/cm");
-    meTrackerSiBR = book1Demo(hname,htitle,100,0.,200.);
-  //   meTrackerSiBR->setAxisTitle("R of Hits (cm)",1);
- //    meTrackerSiBR->setAxisTitle("Count",2);
+    meTrackerSiBR = dbe->book1D(hname,htitle,100,0.,200.);
+    meTrackerSiBR->setAxisTitle("R of Hits (cm)",1);
+    meTrackerSiBR->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerSiFToF");
     sprintf(htitle,"Silicon forward hits, ToF/ns");
-    meTrackerSiFToF = book1Demo(hname,htitle,100,0.,75.);
- //    meTrackerSiFToF->setAxisTitle("Time of Flight of Hits (ns)",1);
- //    meTrackerSiFToF->setAxisTitle("Count",2);
+    meTrackerSiFToF = dbe->book1D(hname,htitle,100,0.,75.);
+    meTrackerSiFToF->setAxisTitle("Time of Flight of Hits (ns)",1);
+    meTrackerSiFToF->setAxisTitle("Count",2);
 
     sprintf(hname,"hTrackerSiFZ");
     sprintf(htitle,"Silicon forward hits, Z/cm");
-    meTrackerSiFZ = book1Demo(hname,htitle,200,-300.,300.);
-//    meTrackerSiFZ->setAxisTitle("Z of Hits (cm)",1);
- //    meTrackerSiFZ->setAxisTitle("Count",2);
- // }
-
-
+    meTrackerSiFZ = dbe->book1D(hname,htitle,200,-300.,300.);
+    meTrackerSiFZ->setAxisTitle("Z of Hits (cm)",1);
+    meTrackerSiFZ->setAxisTitle("Count",2);
+  } else {
+    edm::LogWarning("Demo")
+      << "problem with dbe";
+  }
 }
 
 
@@ -315,7 +318,7 @@ DemoAnalyzer::~DemoAnalyzer()
    // (e.g. close files, deallocate resources etc.)
 
 }
-
+/*
 
 //
 // member functions
@@ -357,14 +360,14 @@ TFileDirectory *DemoAnalyzer::directory(std::string dir)
 
 TH1F * DemoAnalyzer::book1D(std::string dir, std::string name, std::string title, int nchX, double lowX, double highX)
 {
-   return directory(dir)->make<TH1F>(name.c_str(), title.c_str(), nchX, lowX, highX);
+   return directory(dir)->make<MonitorElement>(name.c_str(), title.c_str(), nchX, lowX, highX);
 }
 
 TH1F * DemoAnalyzer::book1Demo(std::string name, std::string title, int nchX, double lowX, double highX) {
   return book1D ("/demo/", name, title, nchX, lowX, highX);
 }
 
-
+*/
 
 
 // ------------ method called for each event  ------------
@@ -473,7 +476,7 @@ DemoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   nPxlHits += j;
   
-//  edm::Service<simtracker::services::RemapDetIdService> detIdRemapService;
+  edm::Service<simtracker::services::RemapDetIdService> detIdRemapService;
 
   /////////////////////////////////
   // get Pixel Forward information
@@ -481,8 +484,8 @@ DemoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::PSimHitContainer thePxlFwdHits;
   // extract low container
   edm::Handle<edm::PSimHitContainer> PxlFwdLowContainer;
-  iEvent.getByLabel(PxlFwdLowSrc_,PxlFwdLowContainer);
-//  detIdRemapService->getByLabel( iEvent, PxlFwdLowSrc_, PxlFwdLowContainer ); // Temporary hack. See note above where detIdRemapService is declared.
+//  iEvent.getByLabel(PxlFwdLowSrc_,PxlFwdLowContainer);
+  detIdRemapService->getByLabel( iEvent, PxlFwdLowSrc_, PxlFwdLowContainer ); // Temporary hack. See note above where detIdRemapService is declared.
   if (PxlFwdLowContainer.isValid()) {
      thePxlFwdHits.insert(thePxlFwdHits.end(),PxlFwdLowContainer->begin(),
 			 PxlFwdLowContainer->end());
