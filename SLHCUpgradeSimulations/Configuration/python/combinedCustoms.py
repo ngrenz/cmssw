@@ -15,6 +15,8 @@ from SLHCUpgradeSimulations.Configuration.rpcCustoms import customise as customi
 from SLHCUpgradeSimulations.Configuration.fixMissingUpgradeGTPayloads import fixRPCConditions
 
 import SLHCUpgradeSimulations.Configuration.aging as aging
+import SLHCUpgradeSimulations.Configuration.jetCustoms as jetCustoms
+
 
 # ngrenz:
 def cust_phase2_BE5DPixel10D(process):
